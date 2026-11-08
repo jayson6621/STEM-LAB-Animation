@@ -1,7 +1,12 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 const loader = new GLTFLoader();
+
 const container = document.getElementById('container');
+
+// Animation mixer
+let mixer = null;
 
 // Create scene
 const scene = new THREE.Scene();
@@ -11,7 +16,7 @@ scene.background = new THREE.Color(0x101b35);
 // Create camera
 const camera = new THREE.PerspectiveCamera(
     75,
-    window.innerWidth / window.innerHeight,
+    container.clientWidth / container.clientHeight,
     0.1,
     1000
 );
@@ -46,12 +51,20 @@ scene.add(ambientLight);
 // Load 3D model
 const modelPath = `${import.meta.env.BASE_URL}loop.glb`;
 
-loader.load(modelPath, function (gltf) {
+console.log('Loading model from:', modelPath);
+
+loader.load(
+    modelPath,
+
+    function (gltf) {
+
+        console.log('3D model loaded successfully!');
 
         const model = gltf.scene;
 
         scene.add(model);
 
+        // Play animation
         if (gltf.animations.length > 0) {
 
             mixer = new THREE.AnimationMixer(model);
@@ -61,6 +74,11 @@ loader.load(modelPath, function (gltf) {
             action.setLoop(THREE.LoopRepeat);
 
             action.play();
+
+        } else {
+
+            console.warn('No animation found in the GLB file.');
+
         }
 
     },
@@ -68,7 +86,9 @@ loader.load(modelPath, function (gltf) {
     undefined,
 
     function (error) {
+
         console.error('Error loading model:', error);
+
     }
 );
 
@@ -81,11 +101,14 @@ function animate() {
 
     const delta = clock.getDelta();
 
-    if (mixer) {
+    if (mixer !== null) {
+
         mixer.update(delta);
+
     }
 
     renderer.render(scene, camera);
+
 }
 
 animate();
