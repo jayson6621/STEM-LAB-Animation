@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
+const loader = new GLTFLoader();
 const container = document.getElementById('container');
 
 // Create scene
